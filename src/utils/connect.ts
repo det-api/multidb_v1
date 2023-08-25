@@ -1,18 +1,35 @@
 import mongoose from "mongoose";
 import config from "config";
 
-const dbConnect = async () => {
-  const dbUrl = config.get<string>("dbUrl");
-
-  try {
-    console.log(dbUrl);
-    await mongoose.connect(dbUrl);
-    console.log("Database connected");
-  } catch (error) {
-    console.log(error);
-    console.log("Could not connect to DB");
-    process.exit(1);
-  }
+const connectionOptions: any = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 };
 
-export default dbConnect;
+// const connectDbs = (dbUrl: string) => {
+//   try {
+//     const dbLink = config.get<string>(dbUrl); //get db url from config default
+
+//     const connectionDb = mongoose.createConnection(dbLink, connectionOptions);
+
+//     connectionDb.on("connected", () => {
+//       console.log(`Connected to ${dbUrl} database`);
+//     });
+
+//     return connectionDb;
+//   } catch (error) {
+//     console.error(`Error:${error.message}`);
+//     process.exit(1);
+//   }
+// };
+
+export function connectDbs(dbUrl: string) {
+  const dbLink = config.get<string>(dbUrl); //get db url from config default
+  let cachedDb = mongoose.createConnection(dbLink, connectionOptions);
+  cachedDb.once("open", () => {
+    console.log(`Connected to ${dbUrl} database`);
+  });
+  return cachedDb;
+}
+
+export default connectDbs;

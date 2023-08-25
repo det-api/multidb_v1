@@ -37,7 +37,7 @@ userRoute.patch(
 );
 
 //getuser
-userRoute.get("/", validateToken, getUserHandler);
+userRoute.get("/", getUserHandler);
 
 //delete each user
 

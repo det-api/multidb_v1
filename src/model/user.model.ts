@@ -5,6 +5,11 @@ import { permitDocument } from "./permit.model";
 import { roleDocument } from "./role.model";
 import bcrypt from "bcryptjs";
 import { stationDetailDocument } from "./stationDetail.model";
+import connectDbs from "../utils/connect";
+import roleModel from "./role.model";
+import PermitModel from "./permit.model";
+
+const controlDb = connectDbs("controlDbUrl");
 
 export interface UserInput {
   email: string;
@@ -27,9 +32,14 @@ const userSchema = new Schema(
     phone: { type: Number, required: true, unique: true },
     name: { type: String, required: true },
     password: { type: String, required: true },
-    stationId: { type: Schema.Types.ObjectId },
-    roles: [{ type: Schema.Types.ObjectId, ref: "role" }],
-    permits: [{ type: Schema.Types.ObjectId, ref: "permit" }],
+    stationId: { type: Schema.Types.ObjectId, default: null },
+    collectionId: {
+      type: Schema.Types.ObjectId,
+      default: "collection",
+      required: true,
+    },
+    roles: [{ type: Schema.Types.ObjectId, ref: roleModel }],
+    permits: [{ type: Schema.Types.ObjectId, ref: PermitModel }],
   },
   {
     timestamps: true,
@@ -58,6 +68,6 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, user.password).catch((e) => false);
 };
 
-const UserModel = mongoose.model<UserDocument>("user", userSchema);
+const UserModel = controlDb.model<UserDocument>("user", userSchema);
 
 export default UserModel;

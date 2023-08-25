@@ -25,7 +25,8 @@ export const loginUser = async ({
     let user = await userModel
       .findOne({ email })
       .populate("roles permits")
-      .select("-__v");
+      .exec();
+      // .select("-__v");
 
     if (!user || !compass(password, user.password)) {
       throw new Error("Creditial Error");

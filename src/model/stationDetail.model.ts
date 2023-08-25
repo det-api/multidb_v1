@@ -1,4 +1,9 @@
 import mongoose, { Schema } from "mongoose";
+import connectDbs from "../utils/connect";
+
+
+const kyawsanDb = connectDbs("kyawsan_DbUrl");
+const chawsuDb = connectDbs("chawsu_DbUrl");
 
 export interface stationDetailDocument extends mongoose.Document {
   name: string;
@@ -16,9 +21,14 @@ const stationDetailSchema = new Schema({
   nozzleCount: { type: Number, required: true },
 });
 
-const stationDetailModel = mongoose.model<stationDetailDocument>(
+const ksStationDetailModel = kyawsanDb.model<stationDetailDocument>(
   "stationDetail",
   stationDetailSchema
 );
 
-export default stationDetailModel;
+const csStationDetailModel = chawsuDb.model<stationDetailDocument>(
+  "stationDetail",
+  stationDetailSchema
+);
+
+export {ksStationDetailModel , csStationDetailModel };

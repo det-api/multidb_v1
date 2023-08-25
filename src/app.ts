@@ -17,6 +17,9 @@ import debtRoute from "./router/debt.routes";
 import checkStationRoute from "./router/checkStation.routes";
 import tempRoute from "./router/temp.routes";
 import dbConnect from "./utils/connect";
+import connectDbs from "./utils/connect";
+import stationCollectionRoute from "./router/collection.routes";
+import collectionRoute from "./router/collection.routes";
 
 const app = express();
 app.use(express.json());
@@ -29,14 +32,6 @@ const server = require("http").createServer(app);
 const port = config.get<number>("port");
 const host = config.get<string>("host");
 
-//mongodb connection
-dbConnect();
-
-mongoose.connection.on("error", (error) => {
-  // Handle mongodb connection error
-  console.error("Error connecting to the database:", error);
-});
-
 // request routes
 
 app.get("/api", (req: Request, res: Response, next: NextFunction) => {
@@ -45,22 +40,24 @@ app.get("/api", (req: Request, res: Response, next: NextFunction) => {
 
 //app => routes => controller => service => model
 
+//control db
 app.use("/api/user", userRoute);
 app.use("/api/role", roleRoute);
 app.use("/api/permit", permitRoute);
+app.use("/api/collection", collectionRoute);
 
-app.use("/api/fuelIn", fuelInRoute);
+// each station db route
 
 app.use("/api/station-detail", stationDetailRoute);
 app.use("/api/daily-report", dailyReportRoute);
 app.use("/api/detail-sale", detailSaleRoute);
+app.use("/api/fuelIn", fuelInRoute);
 app.use("/api/fuel-balance", fuelBalanceRoute);
 
 // app.use("/api/debt", debtRoute);
 // app.use("/api/customer", coustomerRoute);
 app.use("/api/check-station", checkStationRoute);
 app.use("/api/temp", tempRoute);
-
 
 //Error Routes
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
