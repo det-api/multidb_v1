@@ -31,10 +31,11 @@ const fMsg = (
   res: Response,
   msg: string = "all success",
   result: any = [],
+  route: string | null = null,
   totalCount: number | null = null
 ) => {
   if (totalCount != null) {
-    res.status(200).json({ con: true, msg, result, totalCount });
+    res.status(200).json({ con: true, msg, route, result, totalCount });
   } else {
     res.status(200).json({ con: true, msg, result });
   }

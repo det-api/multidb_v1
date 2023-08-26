@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 import connectDbs from "../utils/connect";
-import UserModel, { UserDocument } from "./user.model";
+import { stationDetailDocument } from "./stationDetail.model";
 
 const controlDb = connectDbs("controlDbUrl");
 
 export interface collectionDocument extends mongoose.Document {
   collectionName: string;
-  userCollection: UserDocument["_id"];
+  stationCollection: stationDetailDocument["_id"];
 }
 
 const collectionSchema = new Schema({
   collectionName: { type: String, required: true, unique: true },
-  userCollection: [{ type: Schema.Types.ObjectId, ref: UserModel }],
+  stationCollection: [{ type: Schema.Types.ObjectId, ref: 'stationDetail' }],
 });
 
 const collectionModel = controlDb.model<collectionDocument>(

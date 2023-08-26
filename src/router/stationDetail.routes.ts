@@ -1,4 +1,5 @@
 import {
+  addStationDetailHandler,
   getStationDetailHandler,
   //   addStationDetailHandler,
   //   updateStationDetailHandler,
@@ -23,14 +24,15 @@ stationDetailRoute.get(
   getStationDetailHandler
 );
 
-// stationDetailRoute.post(
-//   "/",
-//   validateToken,
-//   roleValidator(["admin"]),
-//   hasAnyPermit(["add"]),
-//   validateAll(stationDetailSchema),
-//   addStationDetailHandler
-// );
+stationDetailRoute.post(
+  "/",
+  validateToken,
+  roleValidator(["admin"]),
+  hasAnyPermit(["add"]),
+  validateAll(stationDetailSchema),
+  modelController,
+  addStationDetailHandler
+);
 
 // stationDetailRoute.patch(
 //   "/",

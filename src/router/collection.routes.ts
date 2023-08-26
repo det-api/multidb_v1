@@ -4,7 +4,7 @@ import {
   collectionRemovePermitHandler,
   deletCollectionHandler,
   getCollectionHandler,
-} from "../controller/stationCollection.controller";
+} from "../controller/collection.controller";
 import { roleValidator } from "../middleware/roleValidator";
 import { validateAll, validateToken } from "../middleware/validator";
 import { allSchemaId, rolePermitSchema, roleSchema } from "../schema/scheama";
@@ -33,14 +33,14 @@ collectionRoute.delete(
 );
 
 collectionRoute.patch(
-  "/add/users",
+  "/add/stations",
   //   validateToken,
   //   roleValidator(["admin"]),
   collectionAddPermitHandler
 );
 
 collectionRoute.patch(
-  "/remove/users",
+  "/remove/stations",
   //   validateToken,
   //   validateAll(rolePermitSchema),
   //   roleValidator(["admin"]),

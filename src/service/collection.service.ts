@@ -1,19 +1,14 @@
 import { FilterQuery } from "mongoose";
-
-import { UserDocument } from "../model/user.model";
 import collectionModel, { collectionDocument } from "../model/collection.model";
+import { stationDetailDocument } from "../model/stationDetail.model";
 
-
-export const collectionGet = async (
-  query: FilterQuery<collectionDocument>
-) => {
+export const collectionGet = async (query: FilterQuery<collectionDocument>) => {
   try {
     return await collectionModel
       .find(query)
       .lean()
-      .populate("userCollection")
+      // .populate("stationCollection")
       .select("-__v");
-
   } catch (e) {
     throw new Error(e);
   }
@@ -37,14 +32,13 @@ export const collectionDelete = async (
   }
 };
 
-export const collectionAddUser= async (
+export const collectionAddStation = async (
   collectionId: FilterQuery<collectionDocument>,
-   user: UserDocument["_id"]
+  stationId: stationDetailDocument["_id"]
 ) => {
   try {
-    // console.log(collectionId , user)
     await collectionModel.findByIdAndUpdate(collectionId, {
-      $push: { userCollection:  user },
+      $push: { stationCollection: stationId },
     });
     return collectionModel.findById(collectionId);
   } catch (e) {
@@ -52,13 +46,13 @@ export const collectionAddUser= async (
   }
 };
 
-export const collectionRemoveUser= async (
+export const collectionRemoveStation = async (
   collectionId: FilterQuery<collectionDocument>,
-   user: UserDocument["_id"]
+  stationId: stationDetailDocument["_id"]
 ) => {
   try {
     await collectionModel.findByIdAndUpdate(collectionId, {
-      $pull: { userCollection:  user },
+      $pull: { stationCollection: stationId },
     });
     return collectionModel.findById(collectionId);
   } catch (e) {

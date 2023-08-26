@@ -3,12 +3,16 @@ import fMsg from "../utils/helper";
 
 import {
   collectionAdd,
-  collectionAddUser,
+  collectionAddStation,
   collectionDelete,
   collectionGet,
-  collectionRemoveUser,
+  collectionRemoveStation,
 } from "../service/collection.service";
-import { getUser } from "../service/user.service";
+import { getStationDetail } from "../service/stationDetail.service";
+import {
+  csStationDetailModel,
+  ksStationDetailModel,
+} from "../model/stationDetail.model";
 
 export const getCollectionHandler = async (
   req: Request,
@@ -59,34 +63,40 @@ export const collectionAddPermitHandler = async (
       _id: req.body.collectionId,
     });
 
-    let users = await getUser({ _id: req.body.userId });
+    let station;
 
-    // let users;
+    let ksStationDetail = await getStationDetail(
+      { _id: req.body.stationId },
+      ksStationDetailModel
+    );
 
-    // console.log(users);
+    console.log(ksStationDetail);
 
-    // let ksUserDetail = await getUser({ _id: req.body.userId });
-    // if (ksUserDetail.length == 0) {
-    //   let csUserDetail = await getUser({ _id: req.body.userId });
-    //   users = csUserDetail;
-    // } else {
-    //   users = ksUserDetail;
-    // }
-    if (collection.length == 0 || users.length == 0) {
+    if (ksStationDetail.length == 0) {
+      let csStationDetail = await getStationDetail(
+        { _id: req.body.stationId },
+        csStationDetailModel
+      );
+      station = csStationDetail;
+    } else {
+      station = ksStationDetail;
+    }
+
+    if (collection.length == 0 || station.length == 0) {
       next(new Error("collection or station not found"));
     }
-    let foundUsers = collection[0].userCollection.find(
-      (ea: any) => ea._id == req.body.userId
+    let foundStation = collection[0].stationCollection.find(
+      (ea: any) => ea._id == req.body.stationId
     );
-    if (foundUsers) {
-      return next(new Error("user already in exist"));
+    if (foundStation) {
+      return next(new Error("station already in exist"));
     }
-    let result = await collectionAddUser(
+    console.log("wk");
+    let result = await collectionAddStation(
       req.body.collectionId,
-      req.body.userId
+      req.body.stationId
     );
-    console.log(result)
-    fMsg(res, "user added ", result);
+    fMsg(res, "station added ", result);
   } catch (e) {
     next(new Error(e));
   }
@@ -102,17 +112,17 @@ export const collectionRemovePermitHandler = async (
       _id: req.body.collectionId,
     });
 
-    let foundStation = collection[0]["userCollection"].find(
-      (ea: {}) => ea["_id"] == req.body.userId
+    let foundStation = collection[0]["stationCollection"].find(
+      (ea: {}) => ea["_id"] == req.body.stationId
     );
     if (!collection || !foundStation) {
-      throw new Error("collection or user not found");
+      throw new Error("collection or station not found");
     }
-    let result = await collectionRemoveUser(
+    let result = await collectionRemoveStation(
       req.body.collectionId,
-      req.body.userId
+      req.body.stationId
     );
-    fMsg(res, "user removed ", result);
+    fMsg(res, "station removed ", result);
   } catch (e) {
     next(new Error(e));
   }

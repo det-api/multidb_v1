@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import fMsg from "../utils/helper";
 import {
+  addStationDetail,
   getStationDetail,
   stationDetailPaginate,
   // addStationDetail,
@@ -36,31 +37,62 @@ export const getStationDetailHandler = async (
   next: NextFunction
 ) => {
   try {
+    console.log(req.query);
     let pageNo = Number(req.params.page);
 
     if (!pageNo) throw new Error("You need page number");
 
     let model = req.body.modelName;
 
-    let { data, count } = await stationDetailPaginate(pageNo, req.query, model);
-    fMsg(res, "StationDetail are here", data, count);
+    // console.log(model)
+
+    let selectedModel;
+
+    if (model === "kyaw_san") {
+      selectedModel = ksStationDetailModel;
+    } else if (model === "chaw_su") {
+      selectedModel = csStationDetailModel;
+    } else {
+      throw new Error("Invalid model name");
+    }
+
+    let { data, count } = await stationDetailPaginate(
+      pageNo,
+      req.query,
+      selectedModel
+    );
+    fMsg(res, "StationDetail are here", data, model, count);
   } catch (e) {
     next(new Error(e));
   }
 };
 
-// export const addStationDetailHandler = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     let result = await addStationDetail(req.body);
-//     fMsg(res, "New StationDetail data was added", result);
-//   } catch (e) {
-//     next(new Error(e));
-//   }
-// };
+export const addStationDetailHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let model = req.body.modelName;
+
+    // console.log(model)
+
+    let selectedModel;
+
+    if (model === "kyaw_san") {
+      selectedModel = ksStationDetailModel;
+    } else if (model === "chaw_su") {
+      selectedModel = csStationDetailModel;
+    } else {
+      throw new Error("Invalid model name");
+    }
+
+    let result = await addStationDetail(req.body, selectedModel);
+    fMsg(res, "New StationDetail data was added", result);
+  } catch (e) {
+    next(new Error(e));
+  }
+};
 
 // export const updateStationDetailHandler = async (
 //   req: Request,

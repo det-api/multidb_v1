@@ -94,7 +94,7 @@ export const stationDetailSchema = object({
     deviceCount: number({
       required_error: "you need device count",
     }),
-    nozzleNo: number({
+    nozzleCount: number({
       required_error: "you need nozzle count",
     }),
   }),
