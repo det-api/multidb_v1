@@ -2,6 +2,10 @@ import { Response } from "express";
 import config from "config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import {
+  csStationDetailModel,
+  ksStationDetailModel,
+} from "../model/stationDetail.model";
 
 const saltWorkFactor = config.get<number>("saltWorkFactor");
 const secretKey = config.get<string>("secretKey");
@@ -48,6 +52,26 @@ export const fMsg2 = (
   result: any = []
 ) => {
   res.status(status).json({ con: true, msg, result });
+};
+
+export const dBSelector = (dbModel: string, dbOne, dbTwo) => {
+  if (dbModel === "kyaw_san") {
+    return dbOne;
+  } else if (dbModel === "chaw_su") {
+    return dbTwo;
+  } else {
+    throw new Error("Invalid model name");
+  }
+};
+
+export const dbDistribution = (ea) => {
+  if (ea.accessDb === "kyaw_san") {
+    return ksStationDetailModel;
+  } else if (ea.databaseType === "chaw_su") {
+    return csStationDetailModel;
+  } else {
+    return ksStationDetailModel;
+  }
 };
 
 export default fMsg;

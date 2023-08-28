@@ -1,12 +1,10 @@
 import {
   addStationDetailHandler,
+  deleteStationDetailHandler,
   getStationDetailHandler,
-  //   addStationDetailHandler,
-  //   updateStationDetailHandler,
-  //   deleteStationDetailHandler,
+  updateStationDetailHandler,
 } from "../controller/stationDetail.controller";
 
-import { getAllStationDetailHandler } from "../controller/stationDetail.controller";
 import { modelController } from "../middleware/modelControl";
 import { hasAnyPermit } from "../middleware/permitValidator";
 import { roleValidator } from "../middleware/roleValidator";
@@ -14,7 +12,7 @@ import { validateAll, validateToken } from "../middleware/validator";
 import { allSchemaId, stationDetailSchema } from "../schema/scheama";
 const stationDetailRoute = require("express").Router();
 
-stationDetailRoute.get("/", getAllStationDetailHandler);
+// stationDetailRoute.get("/", getAllStationDetailHandler);
 
 stationDetailRoute.get(
   "/:page",
@@ -34,22 +32,24 @@ stationDetailRoute.post(
   addStationDetailHandler
 );
 
-// stationDetailRoute.patch(
-//   "/",
-//   validateToken,
-//   roleValidator(["admin"]),
-//   hasAnyPermit(["edit"]),
-//   validateAll(allSchemaId),
-//   updateStationDetailHandler
-// );
+stationDetailRoute.patch(
+  "/",
+  validateToken,
+  roleValidator(["admin"]),
+  hasAnyPermit(["edit"]),
+  validateAll(allSchemaId),
+  modelController,
+  updateStationDetailHandler
+);
 
-// stationDetailRoute.delete(
-//   "/",
-//   validateToken,
-//   validateAll(allSchemaId),
-//   roleValidator(["admin"]),
-//   hasAnyPermit(["delete"]),
-//   deleteStationDetailHandler
-// );
+stationDetailRoute.delete(
+  "/",
+  validateToken,
+  validateAll(allSchemaId),
+  roleValidator(["admin"]),
+  hasAnyPermit(["delete"]),
+  modelController,
+  deleteStationDetailHandler
+);
 
 export default stationDetailRoute;

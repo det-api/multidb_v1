@@ -9,7 +9,6 @@ export const getCheckStation = async (
   try {
     return checkStationModel
       .find(query)
-      .populate("stationId")
       .select("-otpCode -__v")
       .lean();
   } catch (e) {

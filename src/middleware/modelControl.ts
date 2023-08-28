@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import { collectionGet } from "../service/collection.service";
+import mongoose from "mongoose";
 
 export const modelController = async (
   req: Request,
@@ -8,6 +9,7 @@ export const modelController = async (
 ) => {
   try {
     // Fetch the collection based on the user's collectionId
+
     const collection = await collectionGet({
       _id: req.body.user[0].collectionId,
     });
@@ -34,13 +36,36 @@ export const modelController = async (
         _id: req.query.collectionId,
       });
       delete req.query.collectionId;
-      req.body.modelName = accDb[0].collectionName;
+      req.body.accessDb = accDb[0].collectionName;
       next();
     } else {
-      req.body.modelName = collection[0].collectionName;
+      req.body.accessDb = collection[0].collectionName;
       next(); // Proceed to the next middleware
     }
   } catch (error) {
     next(error); // Pass the error to the error handler middleware
+  }
+};
+
+export const locSevModelControl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const collection = await collectionGet({});
+
+    let result = collection.filter((ea) =>
+      ea.stationCollection.find(
+        (ea) => ea.toString() == req.body.stationDetailId
+      )
+    );
+
+    if (result.length == 0) throw new Error("You need id");
+
+    req.body.accessDb = result[0].collectionName;
+    next();
+  } catch (e) {
+    next(e);
   }
 };

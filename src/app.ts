@@ -44,20 +44,27 @@ app.get("/api", (req: Request, res: Response, next: NextFunction) => {
 app.use("/api/user", userRoute);
 app.use("/api/role", roleRoute);
 app.use("/api/permit", permitRoute);
+
 app.use("/api/collection", collectionRoute);
+
+
+app.use("/api/check-station", checkStationRoute);
+app.use("/api/temp", tempRoute);
 
 // each station db route
 
-app.use("/api/station-detail", stationDetailRoute);
-app.use("/api/daily-report", dailyReportRoute);
-app.use("/api/detail-sale", detailSaleRoute);
-app.use("/api/fuelIn", fuelInRoute);
-app.use("/api/fuel-balance", fuelBalanceRoute);
+app.use("/api/station-detail", stationDetailRoute); //that for define station's detail
+
+
+app.use("/api/detail-sale", detailSaleRoute); //need station 
+app.use("/api/fuelIn", fuelInRoute); //need station
+
+app.use("/api/daily-report", dailyReportRoute); //need station *
+app.use("/api/fuel-balance", fuelBalanceRoute); //need station *
 
 // app.use("/api/debt", debtRoute);
 // app.use("/api/customer", coustomerRoute);
-app.use("/api/check-station", checkStationRoute);
-app.use("/api/temp", tempRoute);
+
 
 //Error Routes
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

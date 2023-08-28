@@ -1,4 +1,8 @@
 import mongoose, { Schema } from "mongoose";
+import connectDbs from "../utils/connect";
+
+const controlDb = connectDbs("controlDbUrl");
+
 
 export interface checkStationDocument extends mongoose.Document {
   otpCode: string;
@@ -15,7 +19,7 @@ const checkStationSchema = new Schema({
   createdAt: { type: Date, default: Date.now() },
 });
 
-const checkStationModel = mongoose.model<checkStationDocument>(
+const checkStationModel = controlDb.model<checkStationDocument>(
   "checkStation",
   checkStationSchema
 );

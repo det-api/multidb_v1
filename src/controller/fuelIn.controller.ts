@@ -8,6 +8,7 @@ import {
   fuelInPaginate,
   fuelInByDate,
 } from "../service/fuelIn.service";
+import { csFuelInModel, ksFuelInModel } from "../model/fuelIn.model";
 
 export const getFuelInHandler = async (
   req: Request,
@@ -15,9 +16,11 @@ export const getFuelInHandler = async (
   next: NextFunction
 ) => {
   try {
+    let model = req.body.accessDb;
+
     let pageNo = Number(req.params.page);
-    let { data, count } = await fuelInPaginate(pageNo, req.query);
-    fMsg(res, "FuelIn are here", data, count);
+    let { data, count } = await fuelInPaginate(pageNo, req.query, model);
+    fMsg(res, "FuelIn are here", data, model, count);
   } catch (e) {
     next(new Error(e));
   }
@@ -29,7 +32,9 @@ export const addFuelInHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await addFuelIn(req.body);
+    let model = req.body.accessDb;
+
+    let result = await addFuelIn(req.body, model);
     fMsg(res, "New FuelIn data was added", result);
   } catch (e) {
     next(new Error(e));
@@ -42,7 +47,9 @@ export const updateFuelInHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await updateFuelIn(req.query, req.body);
+    let model = req.body.accessDb;
+
+    let result = await updateFuelIn(req.query, req.body, model);
     fMsg(res, "updated FuelIn data", result);
   } catch (e) {
     next(new Error(e));
@@ -55,7 +62,8 @@ export const deleteFuelInHandler = async (
   next: NextFunction
 ) => {
   try {
-    await deleteFuelIn(req.query);
+    let model = req.body.accessDb;
+    await deleteFuelIn(req.query, model);
     fMsg(res, "FuelIn data was deleted");
   } catch (e) {
     next(new Error(e));
@@ -88,8 +96,17 @@ export const getFuelInByDateHandler = async (
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
 
-    let { data, count } = await fuelInByDate(query, startDate, endDate, pageNo);
-    fMsg(res, "fuel balance between two date", data, count);
+    let model = req.body.accessDb;
+
+
+    let { data, count } = await fuelInByDate(
+      query,
+      startDate,
+      endDate,
+      pageNo,
+      model
+    );
+    fMsg(res, "fuel balance between two date", data, model, count);
   } catch (e) {
     next(new Error(e));
   }

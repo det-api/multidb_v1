@@ -7,6 +7,10 @@ import {
   statementReportHandler,
   updateDetailSaleHandler,
 } from "../controller/detailSale.controller";
+import {
+  locSevModelControl,
+  modelController,
+} from "../middleware/modelControl";
 
 import { hasAnyPermit } from "../middleware/permitValidator";
 import { roleValidator } from "../middleware/roleValidator";
@@ -23,6 +27,7 @@ detailSaleRoute.get(
   "/pagi/:page",
   validateToken,
   hasAnyPermit(["view"]),
+  modelController,
   getDetailSaleHandler
 );
 
@@ -30,6 +35,7 @@ detailSaleRoute.get(
   "/by-date",
   validateToken,
   hasAnyPermit(["view"]),
+  modelController,
   getDetailSaleByDateHandler
 );
 
@@ -37,14 +43,25 @@ detailSaleRoute.get(
   "/pagi/by-date/:page",
   validateToken,
   hasAnyPermit(["view"]),
+  modelController,
   getDetailSaleDatePagiHandler
 );
 
-//that for only device
-detailSaleRoute.post("/", validateAll(detailSaleSchema), addDetailSaleHandler);
+// //that for only device
+detailSaleRoute.post(
+  "/",
+  validateAll(detailSaleSchema),
+  locSevModelControl,
+  addDetailSaleHandler
+);
+
 detailSaleRoute.patch(
   "/",
+  validateToken,
   validateAll(detailSaleUpdateSchema),
+  roleValidator(["admin"]),
+  hasAnyPermit(["edit"]),
+  modelController,
   updateDetailSaleHandler
 );
 
@@ -54,9 +71,16 @@ detailSaleRoute.delete(
   roleValidator(["admin"]),
   hasAnyPermit(["delete"]),
   validateAll(allSchemaId),
+  modelController,
   deleteDetailSaleHandler
 );
 
-detailSaleRoute.get("/statement-report", statementReportHandler);
+detailSaleRoute.get(
+  "/statement-report",
+  validateToken,
+  hasAnyPermit(["view"]),
+  modelController,
+  statementReportHandler
+);
 
 export default detailSaleRoute;

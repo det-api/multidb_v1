@@ -1,12 +1,27 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
-import detailSaleModel, { detailSaleDocument } from "../model/detailSale.model";
+import {
+  csDetailSaleModel,
+  detailSaleDocument,
+  ksDetailSaleModel,
+} from "../model/detailSale.model";
 import config from "config";
+import { Model } from "mongoose";
+import { dBSelector } from "../utils/helper";
 
 const limitNo = config.get<number>("page_limit");
 
-export const getDetailSale = async (query: FilterQuery<detailSaleDocument>) => {
+export const getDetailSale = async (
+  query: FilterQuery<detailSaleDocument>,
+  dbModel: string
+) => {
   try {
-    return await detailSaleModel
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDetailSaleModel,
+      csDetailSaleModel
+    );
+
+    return await selectedModel
       .find(query)
 
       .populate("stationDetailId")
@@ -16,10 +31,19 @@ export const getDetailSale = async (query: FilterQuery<detailSaleDocument>) => {
   }
 };
 
-export const addDetailSale = async (body: detailSaleDocument) => {
+export const addDetailSale = async (
+  body: detailSaleDocument,
+  dbModel: string
+) => {
   try {
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDetailSaleModel,
+      csDetailSaleModel
+    );
+
     delete body._id;
-    return await new detailSaleModel(body).save();
+    return await new selectedModel(body).save();
   } catch (e) {
     throw new Error(e);
   }
@@ -27,25 +51,39 @@ export const addDetailSale = async (body: detailSaleDocument) => {
 
 export const updateDetailSale = async (
   query: FilterQuery<detailSaleDocument>,
-  body: UpdateQuery<detailSaleDocument>
+  body: UpdateQuery<detailSaleDocument>,
+  dbModel: string
 ) => {
   try {
-    await detailSaleModel.updateMany(query, body);
-    return await detailSaleModel.find(query);
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDetailSaleModel,
+      csDetailSaleModel
+    );
+
+    await selectedModel.updateMany(query, body);
+    return await selectedModel.find(query);
   } catch (e) {
     throw new Error(e);
   }
 };
 
 export const deleteDetailSale = async (
-  query: FilterQuery<detailSaleDocument>
+  query: FilterQuery<detailSaleDocument>,
+  dbModel: string
 ) => {
   try {
-    let DetailSale = await detailSaleModel.find(query);
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDetailSaleModel,
+      csDetailSaleModel
+    );
+
+    let DetailSale = await selectedModel.find(query);
     if (!DetailSale) {
       throw new Error("No DetailSale with that id");
     }
-    return await detailSaleModel.deleteMany(query);
+    return await selectedModel.deleteMany(query);
   } catch (e) {
     throw new Error(e);
   }
@@ -54,12 +92,16 @@ export const deleteDetailSale = async (
 export const getDetailSaleByFuelType = async (
   dateOfDay: string,
   // stationId : string,
-  fuelType: string
+  fuelType: string,
+  dbModel: string
 ) => {
-  let fuel = await getDetailSale({
-    dailyReportDate: dateOfDay,
-    fuelType: fuelType,
-  });
+  let fuel = await getDetailSale(
+    {
+      dailyReportDate: dateOfDay,
+      fuelType: fuelType,
+    },
+    dbModel
+  );
 
   let fuelLiter = fuel
     .map((ea) => ea["saleLiter"])
@@ -73,18 +115,21 @@ export const getDetailSaleByFuelType = async (
 
 export const detailSalePaginate = async (
   pageNo: number,
-  query: FilterQuery<detailSaleDocument>
+  query: FilterQuery<detailSaleDocument>,
+  dbModel: string
 ): Promise<{ count: number; data: detailSaleDocument[] }> => {
+  let selectedModel = dBSelector(dbModel, ksDetailSaleModel, csDetailSaleModel);
+
   const reqPage = pageNo == 1 ? 0 : pageNo - 1;
   const skipCount = limitNo * reqPage;
-  const data = await detailSaleModel
+  const data = await selectedModel
     .find(query)
     .sort({ createAt: -1 })
     .skip(skipCount)
     .limit(limitNo)
     .populate("stationDetailId")
     .select("-__v");
-  const count = await detailSaleModel.countDocuments(query);
+  const count = await selectedModel.countDocuments(query);
 
   return { data, count };
 };
@@ -92,8 +137,11 @@ export const detailSalePaginate = async (
 export const detailSaleByDate = async (
   query: FilterQuery<detailSaleDocument>,
   d1: Date,
-  d2: Date
+  d2: Date,
+  dbModel: string
 ): Promise<detailSaleDocument[]> => {
+  let selectedModel = dBSelector(dbModel, ksDetailSaleModel, csDetailSaleModel);
+
   const filter: FilterQuery<detailSaleDocument> = {
     ...query,
     createAt: {
@@ -102,7 +150,7 @@ export const detailSaleByDate = async (
     },
   };
 
-  let result = await detailSaleModel
+  let result = await selectedModel
     .find(filter)
     .sort({ createAt: -1 })
     .populate("stationDetailId")
@@ -115,9 +163,16 @@ export const detailSaleByDateAndPagi = async (
   query: FilterQuery<detailSaleDocument>,
   d1: Date,
   d2: Date,
-  pageNo: number
+  pageNo: number,
+  dbModel: string
 ): Promise<{ count: number; data: detailSaleDocument[] }> => {
   try {
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDetailSaleModel,
+      csDetailSaleModel
+    );
+
     const reqPage = pageNo == 1 ? 0 : pageNo - 1;
     const skipCount = limitNo * reqPage;
     const filter: FilterQuery<detailSaleDocument> = {
@@ -128,7 +183,7 @@ export const detailSaleByDateAndPagi = async (
       },
     };
 
-    const dataQuery = detailSaleModel
+    const dataQuery = selectedModel
       .find(filter)
       .sort({ createAt: -1 })
       .skip(skipCount)
@@ -136,7 +191,7 @@ export const detailSaleByDateAndPagi = async (
       .populate("stationDetailId")
       .select("-__v");
 
-    const countQuery = detailSaleModel.countDocuments(filter);
+    const countQuery = selectedModel.countDocuments(filter);
 
     const [data, count] = await Promise.all([dataQuery, countQuery]);
 
@@ -147,8 +202,9 @@ export const detailSaleByDateAndPagi = async (
   }
 };
 
-export const getLastDetailSale = async (nozzleNo: string) => {
-  return await detailSaleModel
+export const getLastDetailSale = async (nozzleNo: string, dbModel: string) => {
+  let selectedModel = dBSelector(dbModel, ksDetailSaleModel, csDetailSaleModel);
+  return await selectedModel
     .findOne({ nozzleNo: nozzleNo })
     .sort({ _id: -1, createAt: -1 });
 };

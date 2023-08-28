@@ -1,14 +1,23 @@
-import { FilterQuery, UpdateQuery } from "mongoose";
-import fuelBalanceModel, {
+import { FilterQuery, Model, UpdateQuery } from "mongoose";
+import {
+  csFuelBalanceModel,
   fuelBalanceDocument,
+  ksFuelBalanceModel,
 } from "../model/fuelBalance.model";
 import config from "config";
+import { dBSelector } from "../utils/helper";
 
 export const getFuelBalance = async (
-  query: FilterQuery<fuelBalanceDocument>
+  query: FilterQuery<fuelBalanceDocument>,
+  dbModel: string
 ) => {
   try {
-    return await fuelBalanceModel
+    let selectedModel = dBSelector(
+      dbModel,
+      ksFuelBalanceModel,
+      csFuelBalanceModel
+    );
+    return await selectedModel
       .find(query)
       .lean()
       .populate("stationId")
@@ -18,9 +27,18 @@ export const getFuelBalance = async (
   }
 };
 
-export const addFuelBalance = async (body: fuelBalanceDocument) => {
+export const addFuelBalance = async (
+  body: fuelBalanceDocument,
+  dbModel: string
+) => {
   try {
-    return await new fuelBalanceModel(body).save();
+    let selectedModel = dBSelector(
+      dbModel,
+      ksFuelBalanceModel,
+      csFuelBalanceModel
+    );
+
+    return await new selectedModel(body).save();
   } catch (e) {
     throw new Error(e);
   }
@@ -28,26 +46,40 @@ export const addFuelBalance = async (body: fuelBalanceDocument) => {
 
 export const updateFuelBalance = async (
   query: FilterQuery<fuelBalanceDocument>,
-  body: UpdateQuery<fuelBalanceDocument>
+  body: UpdateQuery<fuelBalanceDocument>,
+  dbModel: string
 ) => {
   try {
-    await fuelBalanceModel.updateMany(query, body);
-    return await fuelBalanceModel.find(query).lean();
+    let selectedModel = dBSelector(
+      dbModel,
+      ksFuelBalanceModel,
+      csFuelBalanceModel
+    );
+
+    await selectedModel.updateMany(query, body);
+    return await selectedModel.find(query).lean();
   } catch (e) {
     throw new Error(e);
   }
 };
 
 export const deleteFuelBalance = async (
-  query: FilterQuery<fuelBalanceDocument>
+  query: FilterQuery<fuelBalanceDocument>,
+  dbModel: string
 ) => {
   try {
-    let fuelBalance = await fuelBalanceModel.find(query);
+    let selectedModel = dBSelector(
+      dbModel,
+      ksFuelBalanceModel,
+      csFuelBalanceModel
+    );
+
+    let fuelBalance = await selectedModel.find(query);
     if (!fuelBalance) {
       throw new Error("No fuelBalance with that id");
     }
 
-    return await fuelBalanceModel.deleteMany(query);
+    return await selectedModel.deleteMany(query);
   } catch (e) {
     throw new Error(e);
   }
@@ -55,7 +87,7 @@ export const deleteFuelBalance = async (
 
 // export const calcFuelBalance = async (query, body, payload: string) => {
 //   try {
-//     let result = await fuelBalanceModel.find(query);
+//     let result = await dbModel.find(query);
 //     if (result.length == 0) {
 //       throw new Error("not work");
 //     }
@@ -73,16 +105,27 @@ export const deleteFuelBalance = async (
 //       balance: gg.opening + gg.fuelIn - cashLiter,
 //     };
 
-//     await fuelBalanceModel.updateMany({ _id: gg?._id }, obj);
-//     return await fuelBalanceModel.find({ _id: gg?._id }).lean();
+//     await dbModel.updateMany({ _id: gg?._id }, obj);
+//     return await dbModel.find({ _id: gg?._id }).lean();
 //   } catch (e) {
 //     throw new Error(e);
 //   }
 // };
 
-export const calcFuelBalance = async (query, body, payload: string) => {
+export const calcFuelBalance = async (
+  query,
+  body,
+  payload: string,
+  dbModel: string
+) => {
   try {
-    let result = await fuelBalanceModel.find(query);
+    let selectedModel = dBSelector(
+      dbModel,
+      ksFuelBalanceModel,
+      csFuelBalanceModel
+    );
+
+    let result = await selectedModel.find(query);
     if (result.length === 0) {
       throw new Error("No fuel balance data found for the given query.");
     }
@@ -106,8 +149,8 @@ export const calcFuelBalance = async (query, body, payload: string) => {
       balance: gg.opening + gg.fuelIn - cashLiter,
     };
 
-    await fuelBalanceModel.updateMany({ _id: gg?._id }, obj);
-    return await fuelBalanceModel.find({ _id: gg?._id }).lean();
+    await selectedModel.updateMany({ _id: gg?._id }, obj);
+    return await selectedModel.find({ _id: gg?._id }).lean();
   } catch (e) {
     throw new Error(e); // Rethrow the error with the actual error message
   }
@@ -115,13 +158,20 @@ export const calcFuelBalance = async (query, body, payload: string) => {
 
 export const fuelBalancePaginate = async (
   pageNo: number,
-  query: FilterQuery<fuelBalanceDocument>
+  query: FilterQuery<fuelBalanceDocument>,
+  dbModel: string
 ): Promise<{ count: number; data: fuelBalanceDocument[] }> => {
   const limitNo = config.get<number>("page_limit");
   const reqPage = pageNo == 1 ? 0 : pageNo - 1;
   const skipCount = limitNo * reqPage;
 
-  const data = await fuelBalanceModel
+  let selectedModel = dBSelector(
+    dbModel,
+    ksFuelBalanceModel,
+    csFuelBalanceModel
+  );
+
+  const data = await selectedModel
     .find(query)
     .sort({ realTime: -1 })
     .skip(skipCount)
@@ -130,7 +180,7 @@ export const fuelBalancePaginate = async (
     .populate("stationId")
     .select("-__v");
 
-  const count = await fuelBalanceModel.countDocuments(query);
+  const count = await selectedModel.countDocuments(query);
 
   return { data, count };
 };
@@ -138,7 +188,8 @@ export const fuelBalancePaginate = async (
 export const fuelBalanceByDate = async (
   query: FilterQuery<fuelBalanceDocument>,
   d1: Date,
-  d2: Date
+  d2: Date,
+  dbModel: string
 ): Promise<fuelBalanceDocument[]> => {
   const filter: FilterQuery<fuelBalanceDocument> = {
     ...query,
@@ -147,8 +198,13 @@ export const fuelBalanceByDate = async (
       $lt: d2,
     },
   };
+  let selectedModel = dBSelector(
+    dbModel,
+    ksFuelBalanceModel,
+    csFuelBalanceModel
+  );
 
-  let result = await fuelBalanceModel
+  let result = await selectedModel
     .find(filter)
     .sort({ realTime: -1 })
     .populate("stationId")

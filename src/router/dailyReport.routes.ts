@@ -1,24 +1,22 @@
 import {
-  getDailyReportHandler,
   addDailyReportHandler,
   updateDailyReportHandler,
   deleteDailyReportHandler,
-  getDailyReportByDateHandler,
-  getDailyReportByMonthHandler,
   // getDailyReportTest,
 } from "../controller/dailyReport.controller";
+import { modelController } from "../middleware/modelControl";
 import { hasAnyPermit } from "../middleware/permitValidator";
 import { roleValidator } from "../middleware/roleValidator";
 import { validateAll, validateToken } from "../middleware/validator";
 import { allSchemaId, dailyReportSchema } from "../schema/scheama";
 const dailyReportRoute = require("express").Router();
 
-dailyReportRoute.get(
-  "/pagi/:page",
-  // validateToken,
-  // hasAnyPermit(["view"]),
-  getDailyReportHandler
-);
+// dailyReportRoute.get(
+//   "/pagi/:page",
+//   validateToken,
+//   hasAnyPermit(["view"]),
+//   getDailyReportHandler
+// );
 
 dailyReportRoute.post(
   "/",
@@ -26,6 +24,7 @@ dailyReportRoute.post(
   roleValidator(["admin"]),
   hasAnyPermit(["add"]),
   validateAll(dailyReportSchema),
+  modelController,
   addDailyReportHandler
 );
 dailyReportRoute.patch(
@@ -34,6 +33,7 @@ dailyReportRoute.patch(
   roleValidator(["admin"]),
   hasAnyPermit(["edit"]),
   validateAll(allSchemaId),
+  modelController,
   updateDailyReportHandler
 );
 dailyReportRoute.delete(
@@ -42,16 +42,17 @@ dailyReportRoute.delete(
   roleValidator(["admin"]),
   hasAnyPermit(["delete"]),
   validateAll(allSchemaId),
+  modelController,
   deleteDailyReportHandler
 );
 
-dailyReportRoute.get(
-  "/by-date/:page",
-  validateToken,
-  hasAnyPermit(["view"]),
-  getDailyReportByDateHandler
-);
+// dailyReportRoute.get(
+//   "/by-date/:page",
+//   validateToken,
+//   hasAnyPermit(["view"]),
+//   getDailyReportByDateHandler
+// );
 
-dailyReportRoute.get("/by-month" , getDailyReportByMonthHandler)
+// dailyReportRoute.get("/by-month" , getDailyReportByMonthHandler)
 
 export default dailyReportRoute;

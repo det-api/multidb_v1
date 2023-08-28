@@ -1,19 +1,13 @@
 import { Request, Response, NextFunction, query } from "express";
 import fMsg from "../utils/helper";
 import {
-  getDailyReport,
   addDailyReport,
   updateDailyReport,
   deleteDailyReport,
   getDailyReportByDate,
   dailyReportPaginate,
-  getDailyReportByMonth,
 } from "../service/dailyReport.service";
-import {
-  getDetailSale,
-  getDetailSaleByFuelType,
-} from "../service/detailSale.service";
-import { number } from "zod";
+import { getDetailSaleByFuelType } from "../service/detailSale.service";
 
 export const getDailyReportHandler = async (
   req: Request,
@@ -22,26 +16,31 @@ export const getDailyReportHandler = async (
 ) => {
   try {
     let pageNo = Number(req.params.page);
+    let model = req.body.accessDb;
 
-    let { data, count } = await dailyReportPaginate(pageNo, req.query);
+    let { data, count } = await dailyReportPaginate(pageNo, req.query, model);
 
     const result = await Promise.all(
       data.map(async (ea) => {
         ea["ninety-two"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "001-Octane Ron(92)"
+          "001-Octane Ron(92)",
+          model
         );
         ea["ninety-five"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "002-Octane Ron(95)"
+          "002-Octane Ron(95)",
+          model
         );
         ea["HSD"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "004-Diesel"
+          "004-Diesel",
+          model
         );
         ea["PHSD"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "005-Premium Diesel"
+          "005-Premium Diesel",
+          model
         );
         return {
           _id: ea["_id"],
@@ -57,7 +56,7 @@ export const getDailyReportHandler = async (
       })
     );
 
-    fMsg(res, "DailyReport are here", result, count);
+    fMsg(res, "DailyReport are here", result, model, count);
   } catch (e) {
     next(new Error(e));
   }
@@ -69,7 +68,8 @@ export const addDailyReportHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await addDailyReport(req.body);
+    let model = req.body.accessDb;
+    let result = await addDailyReport(req.body, model);
     fMsg(res, "New DailyReport data was added", result);
   } catch (e) {
     next(new Error(e));
@@ -82,7 +82,11 @@ export const updateDailyReportHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await updateDailyReport(req.query, req.body);
+    let model = req.body.accessDb;
+
+    // console.log(model)
+
+    let result = await updateDailyReport(req.query, req.body, model);
     fMsg(res, "updated DailyReport data", result);
   } catch (e) {
     next(new Error(e));
@@ -95,7 +99,9 @@ export const deleteDailyReportHandler = async (
   next: NextFunction
 ) => {
   try {
-    await deleteDailyReport(req.query);
+    let model = req.body.accessDb;
+
+    await deleteDailyReport(req.query, model);
     fMsg(res, "DailyReport data was deleted");
   } catch (e) {
     next(new Error(e));
@@ -116,6 +122,7 @@ export const getDailyReportByDateHandler = async (
     delete req.query.eDate;
 
     let query = req.query;
+    let model = req.body.accessDb;
 
     let result;
     if (!sDate) {
@@ -128,24 +135,34 @@ export const getDailyReportByDateHandler = async (
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
 
-    result = await getDailyReportByDate(query, startDate, endDate, pageNo);
+    result = await getDailyReportByDate(
+      query,
+      startDate,
+      endDate,
+      pageNo,
+      model
+    );
     const resultWithDetails = await Promise.all(
       result.map(async (ea) => {
         ea["ninety-two"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "001-Octane Ron(92)"
+          "001-Octane Ron(92)",
+          model
         );
         ea["ninety-five"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "002-Octane Ron(95)"
+          "002-Octane Ron(95)",
+          model
         );
         ea["HSD"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "004-Diesel"
+          "004-Diesel",
+          model
         );
         ea["PHSD"] = await getDetailSaleByFuelType(
           ea["dateOfDay"],
-          "005-Premium Diesel"
+          "005-Premium Diesel",
+          model
         );
         return {
           _id: ea["_id"],
@@ -167,28 +184,28 @@ export const getDailyReportByDateHandler = async (
   }
 };
 
-export const getDailyReportByMonthHandler = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    let year = req.query.year;
-    let month = req.query.month;
+// export const getDailyReportByMonthHandler = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     let year = req.query.year;
+//     let month = req.query.month;
 
-    // delete req.query.year;
-    // delete req.query.month;
+//     // delete req.query.year;
+//     // delete req.query.month;
 
-    // if (!year || !month) {
-    //   next(new Error("you need month or date wk"));
-    // }
-   
-    // if (typeof year != "number" || typeof month != "number")
-    //   return next(new Error("you need month or date"));
+//     // if (!year || !month) {
+//     //   next(new Error("you need month or date wk"));
+//     // }
 
-    let result =await getDailyReportByMonth(req.query, 2023, 5);
-    fMsg(res , 'wk' , result)
-  } catch (e) {
-    next(new Error(e));
-  }
-};
+//     // if (typeof year != "number" || typeof month != "number")
+//     //   return next(new Error("you need month or date"));
+
+//     let result =await getDailyReportByMonth(req.query, 2023, 5);
+//     fMsg(res , 'wk' , result)
+//   } catch (e) {
+//     next(new Error(e));
+//   }
+// };

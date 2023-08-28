@@ -9,8 +9,6 @@ import {
   fuelBalancePaginate,
   fuelBalanceByDate,
 } from "../service/fuelBalance.service";
-import { fuelBalanceDocument } from "../model/fuelBalance.model";
-
 const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
 
 export const getAllFuelBalanceHandler = async (
@@ -19,7 +17,9 @@ export const getAllFuelBalanceHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await getFuelBalance(req.query);
+    let model = req.body.accessDb;
+
+    let result = await getFuelBalance(req.query, model);
     fMsg(res, "FuelIn are here", result);
   } catch (e) {
     next(new Error(e));
@@ -44,12 +44,18 @@ export const getFuelBalanceHandler = async (
       throw new Error("you need date");
     }
 
-    let { count, data } = await fuelBalancePaginate(pageNo, {
-      ...query,
-      createAt: sDate,
-    });
+    let model = req.body.accessDb;
 
-    fMsg(res, "fuelBalance find", data, count);
+    let { count, data } = await fuelBalancePaginate(
+      pageNo,
+      {
+        ...query,
+        createAt: sDate,
+      },
+      model
+    );
+
+    fMsg(res, "fuelBalance find", data, model, count);
   } catch (e) {
     next(new Error(e));
   }
@@ -61,7 +67,9 @@ export const addFuelBalanceHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await addFuelBalance(req.body);
+    let model = req.body.accessDb;
+
+    let result = await addFuelBalance(req.body, model);
     fMsg(res, "New fuelBalance data was added", result);
   } catch (e) {
     next(new Error(e));
@@ -74,7 +82,9 @@ export const updateFuelBalanceHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await updateFuelBalance(req.query, req.body);
+    let model = req.body.accessDb;
+
+    let result = await updateFuelBalance(req.query, req.body, model);
     fMsg(res, "updated fuelBalance data", result);
   } catch (e) {
     next(new Error(e));
@@ -87,7 +97,9 @@ export const deleteFuelBalanceHandler = async (
   next: NextFunction
 ) => {
   try {
-    await deleteFuelBalance(req.query);
+    let model = req.body.accessDb;
+
+    await deleteFuelBalance(req.query, model);
     fMsg(res, "fuelBalance data was deleted");
   } catch (e) {
     next(new Error(e));
@@ -116,7 +128,10 @@ export const getFuelBalanceByDateHandler = async (
     }
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
-    let result = await fuelBalanceByDate(query, startDate, endDate);
+
+    let model = req.body.accessDb;
+
+    let result = await fuelBalanceByDate(query, startDate, endDate, model);
     fMsg(res, "fuel balance between two date", result);
   } catch (e) {
     next(new Error(e));

@@ -32,14 +32,15 @@ export const getDetailSaleHandler = async (
 ) => {
   try {
     let pageNo = Number(req.params.page);
-    let { data, count } = await detailSalePaginate(pageNo, req.query);
-    fMsg(res, "DetailSale are here", data, count);
+    if (!pageNo) throw new Error("You need page number");
+    let model = req.body.accessDb;
+    let { data, count } = await detailSalePaginate(pageNo, req.query, model);
+    fMsg(res, "DetailSale are here", data, model, count);
   } catch (e) {
     next(new Error(e));
   }
 };
 
-//import
 export const addDetailSaleHandler = async (
   req: Request,
   res: Response,
@@ -47,8 +48,11 @@ export const addDetailSaleHandler = async (
 ) => {
   try {
     // //that is remove after pos updated
+    let model = req.body.accessDb;
 
-    let result = await addDetailSale(req.body);
+    let result = await addDetailSale(req.body, model);
+
+    // next update code
 
     // if (result.cashType == "Debt") {
     //   // let checkVocono = await getDebt({ vocono: result.vocono });
@@ -77,29 +81,43 @@ export const addDetailSaleHandler = async (
     //   await updateCoustomer(result.couObjId, coustomerConditon);
     // }
 
-    let checkDate = await getFuelBalance({
-      stationId: req.body.stationDetailId,
-      createAt: req.body.dailyReportDate,
-    });
+    //caculation
 
-    let checkRpDate = await getDailyReport({
-      stationId: result.stationDetailId,
-      dateOfDay: result.dailyReportDate,
-    });
+    let checkDate = await getFuelBalance(
+      {
+        stationId: req.body.stationDetailId,
+        createAt: req.body.dailyReportDate,
+      },
+      model
+    );
 
-    if (checkRpDate.length == 0) {
-      await addDailyReport({
+    let checkRpDate = await getDailyReport(
+      {
         stationId: result.stationDetailId,
         dateOfDay: result.dailyReportDate,
-      });
+      },
+      model
+    );
+
+    if (checkRpDate.length == 0) {
+      await addDailyReport(
+        {
+          stationId: result.stationDetailId,
+          dateOfDay: result.dailyReportDate,
+        },
+        model
+      );
     }
 
     if (checkDate.length == 0) {
       let prevDate = previous(new Date(req.body.dailyReportDate));
-      let prevResult = await getFuelBalance({
-        stationId: req.body.stationDetailId,
-        createAt: prevDate,
-      });
+      let prevResult = await getFuelBalance(
+        {
+          stationId: req.body.stationDetailId,
+          createAt: prevDate,
+        },
+        model
+      );
       await Promise.all(
         prevResult.map(async (ea) => {
           let obj: fuelBalanceDocument;
@@ -127,7 +145,7 @@ export const addDetailSaleHandler = async (
             } as fuelBalanceDocument;
           }
 
-          await addFuelBalance(obj);
+          await addFuelBalance(obj, model);
         })
       );
     }
@@ -139,7 +157,8 @@ export const addDetailSaleHandler = async (
         createAt: result.dailyReportDate,
       },
       { liter: result.saleLiter },
-      result.nozzleNo
+      result.nozzleNo,
+      model
     );
     fMsg(res, "New DetailSale data was added", result);
   } catch (e) {
@@ -153,7 +172,9 @@ export const updateDetailSaleHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await updateDetailSale(req.query, req.body);
+    let model = req.body.accessDb;
+
+    let result = await updateDetailSale(req.query, req.body, model);
     fMsg(res, "updated DetailSale data", result);
   } catch (e) {
     next(new Error(e));
@@ -166,14 +187,16 @@ export const deleteDetailSaleHandler = async (
   next: NextFunction
 ) => {
   try {
-    await deleteDetailSale(req.query);
+    let model = req.body.accessDb;
+
+    await deleteDetailSale(req.query, model);
     fMsg(res, "DetailSale data was deleted");
   } catch (e) {
     next(new Error(e));
   }
 };
 
-//get detail sale between two date
+// //get detail sale between two date
 
 export const getDetailSaleByDateHandler = async (
   req: Request,
@@ -195,10 +218,13 @@ export const getDetailSaleByDateHandler = async (
     if (!eDate) {
       eDate = new Date();
     }
+
+    let model = req.body.accessDb;
+
     //if date error ? you should use split with T or be sure detail Id
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
-    let result = await detailSaleByDate(query, startDate, endDate);
+    let result = await detailSaleByDate(query, startDate, endDate, model);
     fMsg(res, "detail sale between two date", result);
   } catch (e) {
     next(new Error(e));
@@ -226,6 +252,8 @@ export const getDetailSaleDatePagiHandler = async (
     if (!eDate) {
       eDate = new Date();
     }
+
+    let model = req.body.accessDb;
     //if date error ? you should use split with T or be sure detail Id
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
@@ -233,10 +261,11 @@ export const getDetailSaleDatePagiHandler = async (
       query,
       startDate,
       endDate,
-      pageNo
+      pageNo,
+      model
     );
 
-    fMsg(res, "detail sale between two date", data, count);
+    fMsg(res, "detail sale between two date", data, model, count);
   } catch (e) {
     next(new Error(e));
   }
@@ -263,9 +292,14 @@ export const statementReportHandler = async (
     const startDate: Date = new Date(sDate);
     const endDate: Date = new Date(eDate);
 
-    let stationDetail = await getStationDetail({
-      _id: req.query.stationDetailId,
-    });
+    let model = req.body.accessDb;
+
+    let stationDetail = await getStationDetail(
+      {
+        _id: req.query.stationDetailId,
+      },
+      model
+    );
 
     let finalData: any = [];
 
@@ -279,13 +313,13 @@ export const statementReportHandler = async (
         nozzleNo: noz,
       };
 
-      let result = await detailSaleByDate(query, startDate, endDate);
+      let result = await detailSaleByDate(query, startDate, endDate, model);
 
       let count = result.length;
       console.log(count);
 
       if (count == 0) {
-        let lastData = await getLastDetailSale(noz);
+        let lastData = await getLastDetailSale(noz, model);
 
         let data = {
           stationId: stationDetail[0].name,
@@ -334,8 +368,7 @@ export const statementReportHandler = async (
       }
     }
 
-    console.log(finalData);
-    fMsg(res, "final data", finalData);
+    fMsg(res, "final data", finalData, model);
   } catch (e) {
     console.log(e);
   }

@@ -1,7 +1,14 @@
 import mongoose, { Schema } from "mongoose";
-import { getDailyReportByDate } from "../service/dailyReport.service";
-import moment from "moment-timezone";
 import { coustomerDocument } from "./coustomer.model";
+import connectDbs from "../utils/connect";
+import {
+  csStationDetailModel,
+  ksStationDetailModel,
+} from "./stationDetail.model";
+import { dbDistribution } from "../utils/helper";
+
+const kyawsanDb = connectDbs("kyawsan_DbUrl");
+const chawsuDb = connectDbs("chawsu_DbUrl");
 
 export interface detailSaleDocument extends mongoose.Document {
   stationDetailId: string;
@@ -24,12 +31,14 @@ export interface detailSaleDocument extends mongoose.Document {
   createAt: Date;
 }
 
+
 const detailSaleSchema = new Schema({
   stationDetailId: {
     type: Schema.Types.ObjectId,
-    require: true,
-    ref: "stationDetail",
+    required: true,
+    ref: dbDistribution(this)
   },
+  accessDb: { type: String, required: true },
   vocono: { type: String, required: true, unique: true }, //g
   carNo: { type: String, default: null }, //g
   vehicleType: { type: String, default: "car" }, //g
@@ -39,7 +48,7 @@ const detailSaleSchema = new Schema({
   cashType: {
     type: String,
     default: "Cash",
-    enum: ["Cash", "KBZ_Pay", "Credit", "FOC", "Debt", "Others"],
+    // enum: ["Cash", "KBZ_Pay", "Credit", "FOC", "Debt", "Others"],
   },
   casherCode: { type: String, required: true },
   couObjId: { type: Schema.Types.ObjectId, default: null },
@@ -57,16 +66,24 @@ const detailSaleSchema = new Schema({
   createAt: { type: Date, default: new Date() },
 });
 
-detailSaleSchema.pre("save", function (next) {
-  // console.log(this);
-  // if (this.createAt) {
-  //   console.log("wee zzoooo");
-  // }
-  next();
-});
-const detailSaleModel = mongoose.model<detailSaleDocument>(
+
+
+// detailSaleSchema.pre("save", function (next) {
+//  console.log(this);
+//  if (this.createAt) {
+//    console.log("wee zzoooo");
+//  }
+//   next();
+// });
+
+const ksDetailSaleModel = kyawsanDb.model<detailSaleDocument>(
   "detailSale",
   detailSaleSchema
 );
 
-export default detailSaleModel;
+const csDetailSaleModel = chawsuDb.model<detailSaleDocument>(
+  "detailSale",
+  detailSaleSchema
+);
+
+export { ksDetailSaleModel, csDetailSaleModel };

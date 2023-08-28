@@ -48,7 +48,7 @@ export const getUserHandler = async (
   next: NextFunction
 ) => {
   try {
-    let result = await getUser({ _id: req.body.user[0]._id });
+    let result = await getUser({});
     fMsg(res, "registered users", result);
   } catch (e) {
     next(new Error(e));
