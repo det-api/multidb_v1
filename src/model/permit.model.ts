@@ -1,17 +1,16 @@
-import mongoose from 'mongoose'
-import { Schema } from 'mongoose'
-import connectDbs from '../utils/connect';
+import mongoose, {Connection} from "mongoose";
+import { Schema } from "mongoose";
+import connectDbs from "../utils/connect";
 
-const controlDb = connectDbs("controlDbUrl");
-
+const controlDb : Connection = connectDbs("controlDbUrl");
 
 export interface permitDocument extends mongoose.Document {
-    name : string
+  name: string;
 }
 
 const permitSchema = new Schema({
-    name : {type : String , required : true , unique : true}
-})
+  name: { type: String, required: true, unique: true },
+});
 
-const PermitModel = controlDb.model <permitDocument> ('permit' , permitSchema);
-export default PermitModel
+const permitModel = controlDb.model<permitDocument>("permit", permitSchema);
+export default permitModel;

@@ -18,11 +18,6 @@ import {
 } from "../service/fuelBalance.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
 import { addDailyReport, getDailyReport } from "../service/dailyReport.service";
-import {
-  getCoustomerById,
-  updateCoustomer,
-} from "../service/coustomer.service";
-import { addDebt } from "../service/debt.service";
 import { getStationDetail } from "../service/stationDetail.service";
 
 export const getDetailSaleHandler = async (
@@ -82,6 +77,10 @@ export const addDetailSaleHandler = async (
     // }
 
     //caculation
+
+
+    console.log("wkkk")
+
 
     let checkDate = await getFuelBalance(
       {
@@ -162,6 +161,7 @@ export const addDetailSaleHandler = async (
     );
     fMsg(res, "New DetailSale data was added", result);
   } catch (e) {
+    console.log(e)
     next(new Error(e));
   }
 };

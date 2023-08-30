@@ -12,13 +12,8 @@ import stationDetailRoute from "./router/stationDetail.routes";
 import dailyReportRoute from "./router/dailyReport.routes";
 import detailSaleRoute from "./router/detailSale.routes";
 import fuelBalanceRoute from "./router/fuelBalance.routes";
-import coustomerRoute from "./router/coustomer.routes";
-import debtRoute from "./router/debt.routes";
 import checkStationRoute from "./router/checkStation.routes";
 import tempRoute from "./router/temp.routes";
-import dbConnect from "./utils/connect";
-import connectDbs from "./utils/connect";
-import stationCollectionRoute from "./router/collection.routes";
 import collectionRoute from "./router/collection.routes";
 
 const app = express();
@@ -47,7 +42,6 @@ app.use("/api/permit", permitRoute);
 
 app.use("/api/collection", collectionRoute);
 
-
 app.use("/api/check-station", checkStationRoute);
 app.use("/api/temp", tempRoute);
 
@@ -55,8 +49,7 @@ app.use("/api/temp", tempRoute);
 
 app.use("/api/station-detail", stationDetailRoute); //that for define station's detail
 
-
-app.use("/api/detail-sale", detailSaleRoute); //need station 
+app.use("/api/detail-sale", detailSaleRoute); //need station
 app.use("/api/fuelIn", fuelInRoute); //need station
 
 app.use("/api/daily-report", dailyReportRoute); //need station *
@@ -64,7 +57,6 @@ app.use("/api/fuel-balance", fuelBalanceRoute); //need station *
 
 // app.use("/api/debt", debtRoute);
 // app.use("/api/customer", coustomerRoute);
-
 
 //Error Routes
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

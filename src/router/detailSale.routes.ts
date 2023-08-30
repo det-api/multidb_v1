@@ -59,7 +59,7 @@ detailSaleRoute.patch(
   "/",
   validateToken,
   validateAll(detailSaleUpdateSchema),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["edit"]),
   modelController,
   updateDetailSaleHandler
@@ -68,7 +68,7 @@ detailSaleRoute.patch(
 detailSaleRoute.delete(
   "/",
   validateToken,
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["delete"]),
   validateAll(allSchemaId),
   modelController,

@@ -1,9 +1,9 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, {Connection, Schema} from "mongoose";
 import connectDbs from "../utils/connect";
 
 
-const kyawsanDb = connectDbs("kyawsan_DbUrl");
-const chawsuDb = connectDbs("chawsu_DbUrl");
+const kyawsanDb : Connection = connectDbs("kyawsan_DbUrl");
+const chawsuDb : Connection = connectDbs("chawsu_DbUrl");
 
 export interface stationDetailDocument extends mongoose.Document {
   name: string;

@@ -13,7 +13,7 @@ tempRoute.get(
   "/",
   validateToken,
   validateAll(allSchemaId),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   getTempHandler
 );
 tempRoute.post(
@@ -26,7 +26,7 @@ tempRoute.delete(
   "/",
   validateToken,
   validateAll(allSchemaId),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   deletTempHandler
 );
 

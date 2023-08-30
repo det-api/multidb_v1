@@ -17,14 +17,14 @@ checkStationRoute.get(
 checkStationRoute.post(
   "/new",
   validateToken,
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   addCheckStationHandler
 );
 checkStationRoute.delete(
   "/",
   validateToken,
   validateAll(allSchemaId),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   deletCheckStationHandler
 );
 

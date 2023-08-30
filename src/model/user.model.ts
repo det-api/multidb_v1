@@ -35,8 +35,8 @@ const userSchema = new Schema(
     stationId: { type: Schema.Types.ObjectId, default: null },
     collectionId: {
       type: Schema.Types.ObjectId,
-      default: "collection",
-      required: true,
+      ref: "collection",
+      default: null,
     },
     roles: [{ type: Schema.Types.ObjectId, ref: roleModel }],
     permits: [{ type: Schema.Types.ObjectId, ref: PermitModel }],

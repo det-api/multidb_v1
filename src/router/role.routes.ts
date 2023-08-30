@@ -14,7 +14,7 @@ const roleRoute = require("express").Router();
 roleRoute.get(
   "/",
    validateToken,
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   getRoleHandler
 );
 
@@ -22,7 +22,7 @@ roleRoute.post(
   "/",
   validateToken,
   validateAll(roleSchema),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   addRoleHandler
 );
 
@@ -30,7 +30,7 @@ roleRoute.delete(
   "/",
   validateToken,
   validateAll(allSchemaId),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   deletRoleHandler
 );
 
@@ -38,7 +38,7 @@ roleRoute.patch(
   "/add/permit",
   validateToken,
   validateAll(rolePermitSchema),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   roleAddPermitHandler
 );
 
@@ -46,7 +46,7 @@ roleRoute.patch(
   "/remove/permit",
   validateToken,
   validateAll(rolePermitSchema),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   roleRemovePermitHandler
 );
 

@@ -1,10 +1,10 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema , Connection } from "mongoose";
 import moment, { MomentTimezone } from "moment-timezone";
 import connectDbs from "../utils/connect";
 import { dbDistribution } from "../utils/helper";
 
-const kyawsanDb = connectDbs("kyawsan_DbUrl");
-const chawsuDb = connectDbs("chawsu_DbUrl");
+const kyawsanDb: Connection = connectDbs("kyawsan_DbUrl");
+const chawsuDb: Connection  = connectDbs("chawsu_DbUrl");
 
 export interface fuelBalanceDocument extends mongoose.Document {
   stationId: string;
@@ -15,6 +15,7 @@ export interface fuelBalanceDocument extends mongoose.Document {
   tankNo: number;
   cash: number;
   credit: number;
+  accessDb: string;
   balance: number;
   realTime: Date;
   nozzles: [];
@@ -24,7 +25,7 @@ export interface fuelBalanceDocument extends mongoose.Document {
 const fuelBalanceSchema = new Schema({
   stationId: {
     type: Schema.Types.ObjectId,
-    ref:  dbDistribution(this),
+    ref: dbDistribution(this),
     require: true,
   },
   accessDb: { type: String, required: true },

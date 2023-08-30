@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, {Connection} from "mongoose";
 import { Schema } from "mongoose";
-import { permitDocument } from "./permit.model";
+import PermitModel, { permitDocument } from "./permit.model";
 import connectDbs from "../utils/connect";
 
-const controlDb = connectDbs("controlDbUrl");
+const controlDb :Connection = connectDbs("controlDbUrl");
 
 export interface roleDocument extends mongoose.Document {
   name: string;
@@ -12,7 +12,7 @@ export interface roleDocument extends mongoose.Document {
 
 const roleSchema = new Schema({
   name: { type: String, required: true, unique: true },
-  permits: [{ type: Schema.Types.ObjectId, ref: "permit" }],
+  permits: [{ type: Schema.Types.ObjectId, ref: PermitModel }],
 });
 
 const roleModel = controlDb.model<roleDocument>("role", roleSchema);

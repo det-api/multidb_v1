@@ -13,37 +13,36 @@ const collectionRoute = require("express").Router();
 
 collectionRoute.get(
   "/",
-  //   validateToken,
-  //   roleValidator(["admin"]),
+    validateToken,
+    roleValidator(["det"]),
   getCollectionHandler
 );
 
 collectionRoute.post(
   "/",
-  //   validateToken,
-  //   roleValidator(["admin"]),
+    validateToken,
+    roleValidator(["det"]),
   addCollectionHandler
 );
 
 collectionRoute.delete(
   "/",
-  //   validateToken,
-  //   roleValidator(["admin"]),
+    validateToken,
+    roleValidator(["det"]),
   deletCollectionHandler
 );
 
 collectionRoute.patch(
   "/add/stations",
-  //   validateToken,
-  //   roleValidator(["admin"]),
+    validateToken,
+    roleValidator(["det"]),
   collectionAddPermitHandler
 );
 
 collectionRoute.patch(
   "/remove/stations",
-  //   validateToken,
-  //   validateAll(rolePermitSchema),
-  //   roleValidator(["admin"]),
+    validateToken,
+    roleValidator(["det"]),
   collectionRemovePermitHandler
 );
 

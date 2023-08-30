@@ -50,10 +50,6 @@ export const createUserSchema = object({
     name: string({
       required_error: "Name is required",
     }),
-    stationId: string({
-      required_error: "You need station's id",
-    }).regex(/^[0-9a-fA-F]{24}$/, "invlid id"),
-
     password: string({
       required_error: "Password is required",
     }).min(6, "Passwrod too short should be 6 characters minimum"),
@@ -167,28 +163,28 @@ export const detailSaleUpdateSchema = object({
 
 export const fuelInSchema = object({
   body: object({
-    stationId: string({
-      required_error: "you need stationId",
-    }).regex(/^[0-9a-fA-F]{24}$/, "invlid id"),
+    // stationId: string({
+    //   required_error: "you need stationId",
+    // }).regex(/^[0-9a-fA-F]{24}$/, "invlid id"),
 
     driver: string({
       required_error: "you need add driver",
     }),
 
     bowser: string({
-      required_error: "you need add driver",
+      required_error: "you need add bowser",
     }),
 
     tankNo: string({
-      required_error: "you need add driver",
+      required_error: "you need add tankNo",
     }),
 
     fuel_type: string({
-      required_error: "you need add driver",
+      required_error: "you need add fuel_type",
     }),
 
     recive_balance: string({
-      required_error: "you need add driver",
+      required_error: "you need add recive_balance",
     }),
   }),
 });

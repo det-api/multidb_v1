@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, {Connection, Schema} from "mongoose";
 import { coustomerDocument } from "./coustomer.model";
 import connectDbs from "../utils/connect";
 import {
@@ -7,8 +7,8 @@ import {
 } from "./stationDetail.model";
 import { dbDistribution } from "../utils/helper";
 
-const kyawsanDb = connectDbs("kyawsan_DbUrl");
-const chawsuDb = connectDbs("chawsu_DbUrl");
+const kyawsanDb:Connection = connectDbs("kyawsan_DbUrl");
+const chawsuDb:Connection = connectDbs("chawsu_DbUrl");
 
 export interface detailSaleDocument extends mongoose.Document {
   stationDetailId: string;
@@ -20,7 +20,7 @@ export interface detailSaleDocument extends mongoose.Document {
   casherCode: string;
   couObjId: coustomerDocument["_id"];
   isError: boolean;
-
+  accessDb: string;
   vehicleType: string;
   nozzleNo: string;
   fuelType: string;
@@ -31,12 +31,11 @@ export interface detailSaleDocument extends mongoose.Document {
   createAt: Date;
 }
 
-
 const detailSaleSchema = new Schema({
   stationDetailId: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: dbDistribution(this)
+    ref: dbDistribution(this),
   },
   accessDb: { type: String, required: true },
   vocono: { type: String, required: true, unique: true }, //g
@@ -65,8 +64,6 @@ const detailSaleSchema = new Schema({
   },
   createAt: { type: Date, default: new Date() },
 });
-
-
 
 // detailSaleSchema.pre("save", function (next) {
 //  console.log(this);

@@ -1,22 +1,21 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
-import { csFuelInModel, fuelInDocument, ksFuelInModel } from "../model/fuelIn.model";
+import {
+  csFuelInModel,
+  fuelInDocument,
+  ksFuelInModel,
+} from "../model/fuelIn.model";
 import { getFuelBalance, updateFuelBalance } from "./fuelBalance.service";
 import config from "config";
-import { Model } from "mongoose";
 import { dBSelector } from "../utils/helper";
 
 const limitNo = config.get<number>("page_limit");
 
 export const getFuelIn = async (
   query: FilterQuery<fuelInDocument>,
-  dbModel:string
+  dbModel: string
 ) => {
   try {
-    let selectedModel = dBSelector(
-      dbModel,
-      ksFuelInModel,
-      csFuelInModel
-    );
+    let selectedModel = dBSelector(dbModel, ksFuelInModel, csFuelInModel);
     return await selectedModel
       .find(query)
       .lean()
@@ -30,17 +29,13 @@ export const getFuelIn = async (
 export const fuelInPaginate = async (
   pageNo: number,
   query: FilterQuery<fuelInDocument>,
-  dbModel:string
+  dbModel: string
 ): Promise<{ count: number; data: fuelInDocument[] }> => {
   const limitNo = config.get<number>("page_limit");
   const reqPage = pageNo == 1 ? 0 : pageNo - 1;
   const skipCount = limitNo * reqPage;
 
-  let selectedModel = dBSelector(
-    dbModel,
-    ksFuelInModel,
-    csFuelInModel
-  );
+  let selectedModel = dBSelector(dbModel, ksFuelInModel, csFuelInModel);
 
   const data = await selectedModel
     .find(query)
@@ -56,20 +51,19 @@ export const fuelInPaginate = async (
   return { count, data };
 };
 
-export const addFuelIn = async (body: any, dbModel:string) => {
+export const addFuelIn = async (body: any, dbModel: string) => {
   try {
-    let selectedModel = dBSelector(
-      dbModel,
-      ksFuelInModel,
-      csFuelInModel
-    );
+    let selectedModel = dBSelector(dbModel, ksFuelInModel, csFuelInModel);
     let no = await selectedModel.count();
-    let tankCondition = await getFuelBalance({
-      stationId: body.user[0].stationId,
-      // fuelType: body.fuel_type,
-      tankNo: body.tankNo,
-      createAt: body.receive_date,
-    } , dbModel);
+    let tankCondition = await getFuelBalance(
+      {
+        stationId: body.user[0].stationId,
+        // fuelType: body.fuel_type,
+        tankNo: body.tankNo,
+        createAt: body.receive_date,
+      },
+      dbModel
+    );
 
     const updatedBody = {
       ...body,
@@ -77,7 +71,7 @@ export const addFuelIn = async (body: any, dbModel:string) => {
       fuel_in_code: no + 1,
       tank_balance: tankCondition[0].balance,
     };
-    let result = await new dbModel(updatedBody).save();
+    let result = await new selectedModel(updatedBody).save();
     await updateFuelBalance(
       { _id: tankCondition[0]._id },
       { fuelIn: body.recive_balance },
@@ -92,14 +86,10 @@ export const addFuelIn = async (body: any, dbModel:string) => {
 export const updateFuelIn = async (
   query: FilterQuery<fuelInDocument>,
   body: UpdateQuery<fuelInDocument>,
-  dbModel:string
+  dbModel: string
 ) => {
   try {
-    let selectedModel = dBSelector(
-      dbModel,
-      ksFuelInModel,
-      csFuelInModel
-    );
+    let selectedModel = dBSelector(dbModel, ksFuelInModel, csFuelInModel);
     await selectedModel.updateMany(query, body);
     return await selectedModel.find(query).lean();
   } catch (e) {
@@ -109,14 +99,10 @@ export const updateFuelIn = async (
 
 export const deleteFuelIn = async (
   query: FilterQuery<fuelInDocument>,
-  dbModel:string
+  dbModel: string
 ) => {
   try {
-    let selectedModel = dBSelector(
-      dbModel,
-      ksFuelInModel,
-      csFuelInModel
-    );
+    let selectedModel = dBSelector(dbModel, ksFuelInModel, csFuelInModel);
     let FuelIn = await selectedModel.find(query);
     if (!FuelIn) {
       throw new Error("No FuelIn with that id");
@@ -132,15 +118,10 @@ export const fuelInByDate = async (
   d1: Date,
   d2: Date,
   pageNo: number,
-  dbModel:string
+  dbModel: string
 ): Promise<{ count: number; data: fuelInDocument[] }> => {
+  let selectedModel = dBSelector(dbModel, ksFuelInModel, csFuelInModel);
 
-  let selectedModel = dBSelector(
-    dbModel,
-    ksFuelInModel,
-    csFuelInModel
-  );
-  
   const reqPage = pageNo == 1 ? 0 : pageNo - 1;
   const skipCount = limitNo * reqPage;
 

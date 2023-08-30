@@ -5,7 +5,6 @@ import {
   ksDetailSaleModel,
 } from "../model/detailSale.model";
 import config from "config";
-import { Model } from "mongoose";
 import { dBSelector } from "../utils/helper";
 
 const limitNo = config.get<number>("page_limit");
@@ -41,6 +40,8 @@ export const addDetailSale = async (
       ksDetailSaleModel,
       csDetailSaleModel
     );
+
+    body.accessDb = dbModel;
 
     delete body._id;
     return await new selectedModel(body).save();

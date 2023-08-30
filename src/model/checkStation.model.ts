@@ -1,7 +1,7 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, {Connection, Schema} from "mongoose";
 import connectDbs from "../utils/connect";
 
-const controlDb = connectDbs("controlDbUrl");
+const controlDb : Connection = connectDbs("controlDbUrl");
 
 
 export interface checkStationDocument extends mongoose.Document {

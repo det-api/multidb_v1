@@ -1,15 +1,24 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
-import { dailyReportDocument } from "../model/dailyReport.model";
+import {
+  csDailyReportModel,
+  dailyReportDocument,
+  ksDailyReportModel,
+} from "../model/dailyReport.model";
 import config from "config";
-import { Model } from "mongoose";
+import { dBSelector } from "../utils/helper";
 const limitNo = config.get<number>("page_limit");
 
 export const getDailyReport = async (
   query: FilterQuery<dailyReportDocument>,
-  dbModel: Model<dailyReportDocument>
+  dbModel: string
 ) => {
   try {
-    return await dbModel
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDailyReportModel,
+      csDailyReportModel
+    );
+    return await selectedModel
       .find(query)
       .lean()
       .populate("stationId")
@@ -20,11 +29,19 @@ export const getDailyReport = async (
 };
 
 export const addDailyReport = async (
-  body: dailyReportDocument | {},
-  dbModel: Model<dailyReportDocument>
+  body: { stationId: string; dateOfDay: string; accessDb?: string },
+  dbModel: string
 ) => {
   try {
-    return await new dbModel(body).save();
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDailyReportModel,
+      csDailyReportModel
+    );
+
+    if (!body.accessDb) body.accessDb = dbModel;
+
+    return await new selectedModel(body).save();
   } catch (e) {
     throw new Error(e);
   }
@@ -32,27 +49,40 @@ export const addDailyReport = async (
 
 export const updateDailyReport = async (
   query: FilterQuery<dailyReportDocument>,
-  body: UpdateQuery<dailyReportDocument> ,
-  dbModel: Model<dailyReportDocument>
+  body: UpdateQuery<dailyReportDocument>,
+  dbModel: string
 ) => {
   try {
-    await dbModel.updateMany(query, body);
-    return await dbModel.find(query).lean();
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDailyReportModel,
+      csDailyReportModel
+    );
+
+    if (!body.accessDb) body.accessDb = dbModel;
+
+    await selectedModel.updateMany(query, body);
+    return await selectedModel.find(query).lean();
   } catch (e) {
     throw new Error(e);
   }
 };
 
 export const deleteDailyReport = async (
-  query: FilterQuery<dailyReportDocument>, 
-  dbModel: Model<dailyReportDocument>
+  query: FilterQuery<dailyReportDocument>,
+  dbModel: string
 ) => {
   try {
-    let DailyReport = await dbModel.find(query);
+    let selectedModel = dBSelector(
+      dbModel,
+      ksDailyReportModel,
+      csDailyReportModel
+    );
+    let DailyReport = await selectedModel.find(query);
     if (!DailyReport) {
       throw new Error("No DailyReport with that id");
     }
-    return await dbModel.deleteMany(query);
+    return await selectedModel.deleteMany(query);
   } catch (e) {
     throw new Error(e);
   }
@@ -63,7 +93,7 @@ export const getDailyReportByDate = async (
   d1: Date,
   d2: Date,
   pageNo: number,
-  dbModel: Model<dailyReportDocument>
+  dbModel: string
 ): Promise<dailyReportDocument[]> => {
   const reqPage = pageNo == 1 ? 0 : pageNo - 1;
   const skipCount = limitNo * reqPage;
@@ -76,7 +106,13 @@ export const getDailyReportByDate = async (
     },
   };
 
-  let result = await dbModel
+  let selectedModel = dBSelector(
+    dbModel,
+    ksDailyReportModel,
+    csDailyReportModel
+  );
+
+  let result = await selectedModel
     .find(filter)
     .sort({ date: -1 })
     .skip(skipCount)
@@ -89,12 +125,19 @@ export const getDailyReportByDate = async (
 export const dailyReportPaginate = async (
   pageNo: number,
   query: FilterQuery<dailyReportDocument>,
-  dbModel: Model<dailyReportDocument>
+  dbModel: string
 ): Promise<{ count: number; data: dailyReportDocument[] }> => {
   const reqPage = pageNo == 1 ? 0 : pageNo - 1;
   const skipCount = limitNo * reqPage;
 
-  const data = await dbModel
+
+  let selectedModel = dBSelector(
+    dbModel,
+    ksDailyReportModel,
+    csDailyReportModel
+  );
+
+  const data = await selectedModel
     .find(query)
     .sort({ date: -1 })
     .skip(skipCount)
@@ -102,7 +145,7 @@ export const dailyReportPaginate = async (
     .populate("stationId")
     .select("-__v");
 
-  const count = await dbModel.countDocuments(query);
+  const count = await selectedModel.countDocuments(query);
 
   return { count, data };
 };
@@ -111,7 +154,7 @@ export const getDailyReportByMonth = async (
   query: FilterQuery<dailyReportDocument>,
   year: number,
   month: number,
-  dbModel: Model<dailyReportDocument>
+  dbModel: string
 ): Promise<dailyReportDocument[]> => {
   const startDate = new Date(year, month - 1, 1, 0, 0, 0); // Month is zero-based
   const endDate = new Date(year, month, 1, 0, 0, 0); // Month is zero-based
@@ -123,7 +166,13 @@ export const getDailyReportByMonth = async (
     },
   };
 
-  const result = await dbModel.find(filter).select("-__v");
+  let selectedModel = dBSelector(
+    dbModel,
+    ksDailyReportModel,
+    csDailyReportModel
+  );
+
+  const result = await selectedModel.find(filter).select("-__v");
 
   return result;
 };

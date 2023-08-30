@@ -25,7 +25,7 @@ stationDetailRoute.get(
 stationDetailRoute.post(
   "/",
   validateToken,
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["add"]),
   validateAll(stationDetailSchema),
   modelController,
@@ -35,7 +35,7 @@ stationDetailRoute.post(
 stationDetailRoute.patch(
   "/",
   validateToken,
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["edit"]),
   validateAll(allSchemaId),
   modelController,
@@ -46,7 +46,7 @@ stationDetailRoute.delete(
   "/",
   validateToken,
   validateAll(allSchemaId),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["delete"]),
   modelController,
   deleteStationDetailHandler

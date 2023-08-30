@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, {Connection} from "mongoose";
 import { Schema } from "mongoose";
 import moment, { MomentTimezone } from "moment-timezone";
 import connectDbs from "../utils/connect";
 import { dbDistribution } from "../utils/helper";
 
-const kyawsanDb = connectDbs("kyawsan_DbUrl");
-const chawsuDb = connectDbs("chawsu_DbUrl");
+const kyawsanDb : Connection = connectDbs("kyawsan_DbUrl");
+const chawsuDb : Connection = connectDbs("chawsu_DbUrl");
 
 export interface fuelInDocument extends mongoose.Document {
   stationId: string;

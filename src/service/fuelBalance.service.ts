@@ -1,4 +1,4 @@
-import { FilterQuery, Model, UpdateQuery } from "mongoose";
+import { FilterQuery,  UpdateQuery } from "mongoose";
 import {
   csFuelBalanceModel,
   fuelBalanceDocument,
@@ -38,6 +38,8 @@ export const addFuelBalance = async (
       csFuelBalanceModel
     );
 
+   if(!body.accessDb) body.accessDb = dbModel
+
     return await new selectedModel(body).save();
   } catch (e) {
     throw new Error(e);
@@ -76,7 +78,7 @@ export const deleteFuelBalance = async (
 
     let fuelBalance = await selectedModel.find(query);
     if (!fuelBalance) {
-      throw new Error("No fuelBalance with that id");
+       new Error("No fuelBalance with that id");
     }
 
     return await selectedModel.deleteMany(query);
@@ -85,32 +87,6 @@ export const deleteFuelBalance = async (
   }
 };
 
-// export const calcFuelBalance = async (query, body, payload: string) => {
-//   try {
-//     let result = await dbModel.find(query);
-//     if (result.length == 0) {
-//       throw new Error("not work");
-//     }
-//     let gg = result.find(
-//       (ea: { nozzles: string[] }) =>
-//         ea["nozzles"].includes(payload.toString()) == true
-//     );
-//     if (!gg) {
-//       throw new Error("no tank with that nozzle");
-//     }
-//     let cashLiter = gg?.cash + body.liter;
-
-//     let obj = {
-//       cash: cashLiter,
-//       balance: gg.opening + gg.fuelIn - cashLiter,
-//     };
-
-//     await dbModel.updateMany({ _id: gg?._id }, obj);
-//     return await dbModel.find({ _id: gg?._id }).lean();
-//   } catch (e) {
-//     throw new Error(e);
-//   }
-// };
 
 export const calcFuelBalance = async (
   query,
@@ -127,7 +103,7 @@ export const calcFuelBalance = async (
 
     let result = await selectedModel.find(query);
     if (result.length === 0) {
-      throw new Error("No fuel balance data found for the given query.");
+       new Error("No fuel balance data found for the given query.");
     }
 
     let gg = result.find((ea: { nozzles: string[] }) =>
@@ -135,11 +111,11 @@ export const calcFuelBalance = async (
     );
 
     if (!gg) {
-      throw new Error("No tank with the provided nozzle found.");
+       new Error("No tank with the provided nozzle found.");
     }
 
     if (typeof body.liter !== "number" || isNaN(body.liter)) {
-      throw new Error("Invalid 'liter' value. It must be a valid number.");
+       new Error("Invalid 'liter' value. It must be a valid number.");
     }
 
     let cashLiter = gg.cash + body.liter;
@@ -204,11 +180,9 @@ export const fuelBalanceByDate = async (
     csFuelBalanceModel
   );
 
-  let result = await selectedModel
+  return await selectedModel
     .find(filter)
     .sort({ realTime: -1 })
     .populate("stationId")
     .select("-__v");
-
-  return result;
 };

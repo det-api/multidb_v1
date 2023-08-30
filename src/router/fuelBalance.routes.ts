@@ -39,7 +39,7 @@ fuelBalanceRoute.post(
   "/",
   validateToken,
   validateAll(fuelBalanceSchema),
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["add"]),
   modelController,
   addFuelBalanceHandler
@@ -48,7 +48,7 @@ fuelBalanceRoute.post(
 fuelBalanceRoute.patch(
   "/",
   validateToken,
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["edit"]),
   modelController,
   updateFuelBalanceHandler
@@ -57,7 +57,7 @@ fuelBalanceRoute.patch(
 fuelBalanceRoute.delete(
   "/",
   validateToken,
-  roleValidator(["admin"]),
+  roleValidator(["det"]),
   hasAnyPermit(["delete"]),
   modelController,
   deleteFuelBalanceHandler
