@@ -57,7 +57,7 @@ export const fMsg2 = (
 export const dBSelector = (dbModel: string, dbOne, dbTwo) => {
   if (dbModel === "kyaw_san") {
     return dbOne;
-  } else if (dbModel === "chaw_su") {
+  } else if (dbModel === "common") {
     return dbTwo;
   } else {
     throw new Error("Invalid model name");
@@ -67,7 +67,7 @@ export const dBSelector = (dbModel: string, dbOne, dbTwo) => {
 export const dbDistribution = (ea) => {
   if (ea.accessDb === "kyaw_san") {
     return ksStationDetailModel;
-  } else if (ea.databaseType === "chaw_su") {
+  } else if (ea.databaseType === "common") {
     return csStationDetailModel;
   } else {
     return ksStationDetailModel;

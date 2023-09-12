@@ -4,7 +4,7 @@ import connectDbs from "../utils/connect";
 import { dbDistribution } from "../utils/helper";
 
 const kyawsanDb: Connection = connectDbs("kyawsan_DbUrl");
-const chawsuDb: Connection  = connectDbs("chawsu_DbUrl");
+const commonDb: Connection  = connectDbs("common_DbUrl");
 
 export interface fuelBalanceDocument extends mongoose.Document {
   stationId: string;
@@ -58,7 +58,7 @@ const ksFuelBalanceModel = kyawsanDb.model<fuelBalanceDocument>(
   fuelBalanceSchema
 );
 
-const csFuelBalanceModel = chawsuDb.model<fuelBalanceDocument>(
+const csFuelBalanceModel = commonDb.model<fuelBalanceDocument>(
   "fuelBalance",
   fuelBalanceSchema
 );

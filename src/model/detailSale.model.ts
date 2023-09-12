@@ -1,4 +1,4 @@
-import mongoose, {Connection, Schema} from "mongoose";
+import mongoose, { Connection, Schema } from "mongoose";
 import { coustomerDocument } from "./coustomer.model";
 import connectDbs from "../utils/connect";
 import {
@@ -7,8 +7,8 @@ import {
 } from "./stationDetail.model";
 import { dbDistribution } from "../utils/helper";
 
-const kyawsanDb:Connection = connectDbs("kyawsan_DbUrl");
-const chawsuDb:Connection = connectDbs("chawsu_DbUrl");
+const kyawsanDb: Connection = connectDbs("kyawsan_DbUrl");
+const commonDb: Connection = connectDbs("common_DbUrl");
 
 export interface detailSaleDocument extends mongoose.Document {
   stationDetailId: string;
@@ -78,7 +78,7 @@ const ksDetailSaleModel = kyawsanDb.model<detailSaleDocument>(
   detailSaleSchema
 );
 
-const csDetailSaleModel = chawsuDb.model<detailSaleDocument>(
+const csDetailSaleModel = commonDb.model<detailSaleDocument>(
   "detailSale",
   detailSaleSchema
 );

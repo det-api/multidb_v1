@@ -61,8 +61,7 @@ export const locSevModelControl = async (
   try {
     const collection = await collectionGet({});
 
-    let result = collection.filter((ea) =>
-      ea.stationCollection.find(
+    let result = collection.filter((ea) =>   ea.stationCollection.find(
         (ea) => ea.toString() == req.body.stationDetailId
       )
     );

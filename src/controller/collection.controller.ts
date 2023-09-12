@@ -67,7 +67,7 @@ export const collectionAddPermitHandler = async (
 
     let ksStationDetail = await getStationDetail(
       { _id: req.body.stationId },
-      ksStationDetailModel
+      'kyaw_san'
     );
 
     console.log(ksStationDetail);
@@ -75,7 +75,7 @@ export const collectionAddPermitHandler = async (
     if (ksStationDetail.length == 0) {
       let csStationDetail = await getStationDetail(
         { _id: req.body.stationId },
-        csStationDetailModel
+        'common'
       );
       station = csStationDetail;
     } else {

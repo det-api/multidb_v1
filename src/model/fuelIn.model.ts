@@ -1,11 +1,11 @@
-import mongoose, {Connection} from "mongoose";
+import mongoose, { Connection } from "mongoose";
 import { Schema } from "mongoose";
 import moment, { MomentTimezone } from "moment-timezone";
 import connectDbs from "../utils/connect";
 import { dbDistribution } from "../utils/helper";
 
-const kyawsanDb : Connection = connectDbs("kyawsan_DbUrl");
-const chawsuDb : Connection = connectDbs("chawsu_DbUrl");
+const kyawsanDb: Connection = connectDbs("kyawsan_DbUrl");
+const commonDb: Connection = connectDbs("common_DbUrl");
 
 export interface fuelInDocument extends mongoose.Document {
   stationId: string;
@@ -56,6 +56,6 @@ fuelInSchema.pre("save", function (next) {
 });
 
 const ksFuelInModel = kyawsanDb.model<fuelInDocument>("fuelIn", fuelInSchema);
-const csFuelInModel = chawsuDb.model<fuelInDocument>("fuelIn", fuelInSchema);
+const csFuelInModel = commonDb.model<fuelInDocument>("fuelIn", fuelInSchema);
 
 export { ksFuelInModel, csFuelInModel };

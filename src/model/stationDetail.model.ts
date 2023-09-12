@@ -3,7 +3,7 @@ import connectDbs from "../utils/connect";
 
 
 const kyawsanDb : Connection = connectDbs("kyawsan_DbUrl");
-const chawsuDb : Connection = connectDbs("chawsu_DbUrl");
+const commonDb : Connection = connectDbs("common_DbUrl");
 
 export interface stationDetailDocument extends mongoose.Document {
   name: string;
@@ -26,7 +26,7 @@ const ksStationDetailModel = kyawsanDb.model<stationDetailDocument>(
   stationDetailSchema
 );
 
-const csStationDetailModel = chawsuDb.model<stationDetailDocument>(
+const csStationDetailModel = commonDb.model<stationDetailDocument>(
   "stationDetail",
   stationDetailSchema
 );

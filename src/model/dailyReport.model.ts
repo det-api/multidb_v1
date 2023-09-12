@@ -4,7 +4,7 @@ import connectDbs from "../utils/connect";
 import { dbDistribution } from "../utils/helper";
 
 const kyawsanDb: Connection = connectDbs("kyawsan_DbUrl");
-const chawsuDb: Connection = connectDbs("chawsu_DbUrl");
+const commonDb: Connection = connectDbs("common_DbUrl");
 
 export interface dailyReportDocument extends mongoose.Document {
   stationId: string;
@@ -40,7 +40,7 @@ const ksDailyReportModel = kyawsanDb.model<dailyReportDocument>(
   dailyReportSchema
 );
 
-const csDailyReportModel = chawsuDb.model<dailyReportDocument>(
+const csDailyReportModel = commonDb.model<dailyReportDocument>(
   "dailyReport",
   dailyReportSchema
 );
