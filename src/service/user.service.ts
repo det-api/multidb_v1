@@ -22,11 +22,14 @@ export const loginUser = async ({
   password: string;
 }) => {
   try {
+    console.log(email, password);
     let user = await userModel
       .findOne({ email })
       .populate("roles permits")
       .exec();
-      // .select("-__v");
+    // .select("-__v");
+
+    console.log(user);
 
     if (!user || !compass(password, user.password)) {
       throw new Error("Creditial Error");
@@ -68,7 +71,7 @@ export const getCredentialUser = async (query: FilterQuery<UserDocument>) => {
   }
 };
 
-export const updateUser= async (
+export const updateUser = async (
   query: FilterQuery<UserDocument>,
   body: UpdateQuery<UserDocument>
 ) => {

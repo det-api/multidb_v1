@@ -45,6 +45,13 @@ export const addDetailSaleHandler = async (
     // //that is remove after pos updated
     let model = req.body.accessDb;
 
+    let check = await getDetailSale({ vocono: req.body.vocono }, model);
+    //console.log(check);
+    if (check.length != 0) {
+      fMsg(res);
+      return;
+    }
+
     let result = await addDetailSale(req.body, model);
 
     // next update code
@@ -78,9 +85,7 @@ export const addDetailSaleHandler = async (
 
     //caculation
 
-
-    console.log("wkkk")
-
+    console.log("wkkk");
 
     let checkDate = await getFuelBalance(
       {
@@ -161,7 +166,7 @@ export const addDetailSaleHandler = async (
     );
     fMsg(res, "New DetailSale data was added", result);
   } catch (e) {
-    console.log(e)
+    console.log(e);
     next(new Error(e));
   }
 };

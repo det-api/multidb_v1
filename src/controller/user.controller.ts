@@ -36,6 +36,7 @@ export const loginUserHandler = async (
 ) => {
   try {
     let result = await loginUser(req.body);
+    console.log(result);
     fMsg(res, "registered users", result);
   } catch (e) {
     next(e);
